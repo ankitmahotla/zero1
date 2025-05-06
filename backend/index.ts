@@ -13,6 +13,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1/auth", routes.authRouter);
+app.use("/api/v1/problems", routes.problemRouter);
 
 const PORT = process.env.PORT ?? 8000;
 

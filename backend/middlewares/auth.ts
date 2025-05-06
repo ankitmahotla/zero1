@@ -50,3 +50,26 @@ export const authMiddleware: RequestHandler = async (req, res, next) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const checkAdmin: RequestHandler = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const user = await db.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        role: true,
+      },
+    });
+
+    if (!user || user.role !== "ADMIN") {
+      return res.status(403).json({ message: "Forbidden access" });
+    }
+
+    next();
+  } catch (e) {
+    console.error("Error checking admin role:", e);
+    res.status(500).json({ message: "Error checking admin role" });
+  }
+};
