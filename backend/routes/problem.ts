@@ -20,8 +20,8 @@ router.post(
   asHandler(checkAdmin),
   asHandler(createProblem),
 );
-router.post("/", asHandler(authMiddleware), asHandler(getProblems));
-router.post("/:id", asHandler(authMiddleware), asHandler(getProblem));
+router.get("/", asHandler(authMiddleware), asHandler(getProblems));
+router.get("/:id", asHandler(authMiddleware), asHandler(getProblem));
 router.put(
   "/:id",
   asHandler(authMiddleware),
