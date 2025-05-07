@@ -81,8 +81,55 @@ const createProblem: RequestHandler = async (req, res, next) => {
       .json({ success: false, error: "Error creating new problem" });
   }
 };
-const getProblems: RequestHandler = async (req, res, next) => {};
-const getProblem: RequestHandler = async (req, res, next) => {};
+const getProblems: RequestHandler = async (req, res, next) => {
+  try {
+    const problems = await prisma?.problem.findMany();
+
+    if (!problems || problems.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No Problems found",
+      });
+    }
+
+    res
+      .status(200)
+      .json({ success: true, message: "All problems fetched", problems });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching all problems",
+    });
+  }
+};
+const getProblem: RequestHandler = async (req, res, next) => {
+  const problemId = req.params.id;
+  try {
+    const problem = await prisma?.problem.findFirst({
+      where: {
+        id: problemId,
+      },
+    });
+
+    if (!problem) {
+      return res.status(404).json({
+        success: false,
+        message: "No such problem exists",
+      });
+    }
+
+    res
+      .status(200)
+      .json({ success: true, message: "Fetched Problem", problem });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({
+      success: false,
+      message: "Error fetching problem",
+    });
+  }
+};
 const updateProblem: RequestHandler = async (req, res, next) => {};
 const deleteProblem: RequestHandler = async (req, res, next) => {};
 const getUserSolvedProblems: RequestHandler = async (req, res, next) => {};
