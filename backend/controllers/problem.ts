@@ -68,11 +68,17 @@ const createProblem: RequestHandler = async (req, res, next) => {
         },
       });
 
-      return res.status(201).json(newProblem);
+      return res.status(201).json({
+        success: true,
+        message: "Problem created",
+        problem: newProblem,
+      });
     }
   } catch (e) {
     console.error("Error creating new problem", e);
-    return res.status(500).json({ error: "Error creating new problem" });
+    return res
+      .status(500)
+      .json({ success: false, error: "Error creating new problem" });
   }
 };
 const getProblems: RequestHandler = async (req, res, next) => {};
