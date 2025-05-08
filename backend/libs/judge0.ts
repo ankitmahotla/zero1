@@ -9,7 +9,7 @@ type Submissions = {
   source_code: string;
   language_id: string;
   stdin: string;
-  expected_output: string;
+  expected_output?: string;
 };
 
 type Token = {
@@ -57,3 +57,14 @@ export const pollBatchResults = async (tokens: Token[]) => {
     await sleep(1000);
   }
 };
+
+export function getLanguageName(languageId: Number) {
+  const LANGUAGE_NAMES = {
+    74: "TypeScript",
+    63: "JavaScript",
+    71: "Python",
+    62: "Java",
+  };
+
+  return LANGUAGE_NAMES[languageId] || "Unknown";
+}
