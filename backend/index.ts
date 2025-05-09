@@ -15,6 +15,8 @@ app.get("/", (req, res) => {
 app.use("/api/v1/auth", routes.authRouter);
 app.use("/api/v1/problems", routes.problemRouter);
 app.use("/api/v1/execute-code", routes.executeCodeRouter);
+app.use("/api/v1/submissions", routes.submissionRouter);
+app.use("/api/v1/playlists", routes.submissionRouter);
 
 const PORT = process.env.PORT ?? 8000;
 
