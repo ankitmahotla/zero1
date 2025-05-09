@@ -1,6 +1,10 @@
 import type { NextFunction, Request, Response } from "express";
 import { db } from "../libs/db";
-import { getLanguageId, pollBatchResults, submitBatch } from "../libs/judge0";
+import {
+  getJudge0LanguageId,
+  pollBatchResults,
+  submitBatch,
+} from "../libs/judge0";
 
 export type RequestHandler = (
   req: Request,
@@ -27,7 +31,7 @@ const createProblem: RequestHandler = async (req, res, next) => {
 
   try {
     for (const [language, solutionCode] of Object.entries(referenceSolutions)) {
-      const languageId = getLanguageId(language);
+      const languageId = getJudge0LanguageId(language);
 
       if (!languageId) {
         return res.status(400).json({ error: `${language} is not supported` });

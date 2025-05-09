@@ -143,6 +143,8 @@ exports.Prisma.ProblemScalarFieldEnum = {
   hints: 'hints',
   editorial: 'editorial',
   testcases: 'testcases',
+  codeSnippets: 'codeSnippets',
+  referenceSolutions: 'referenceSolutions',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -194,6 +196,11 @@ exports.Prisma.SortOrder = {
 };
 
 exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull
 };
 

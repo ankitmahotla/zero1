@@ -64,6 +64,13 @@ export const executeCode: RequestHandler = async (req, res, next) => {
         memory: result.memory ? `${result.memory} KB` : undefined,
         time: result.time ? `${result.time} s` : undefined,
       };
+
+      // console.log(`Testcase #${i+1}`);
+      // console.log(`Input for testcase #${i+1}: ${stdin[i]}`)
+      // console.log(`Expected Output for testcase #${i+1}: ${expected_output}`)
+      // console.log(`Actual output for testcase #${i+1}: ${stdout}`)
+
+      // console.log(`Matched testcase #${i+1}: ${passed}`)
     });
 
     console.log(detailedResults);

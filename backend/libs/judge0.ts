@@ -1,45 +1,21 @@
 import axios from "axios";
-import { sleep } from "bun";
 
-type LanguageMap = {
-  [key: string]: number;
-};
-
-type Submissions = {
-  source_code: string;
-  language_id: string;
-  stdin: string;
-  expected_output?: string;
-};
-
-type Token = {
-  token: string;
-};
-
-export const getLanguageId = (language: string) => {
-  const languageMap: LanguageMap = {
+export const getJudge0LanguageId = (language) => {
+  const languageMap = {
     PYTHON: 71,
     JAVA: 62,
     JAVASCRIPT: 63,
   };
 
-  return languageMap[language.toUpperCase()] || null;
+  return languageMap[language.toUpperCase()];
 };
 
-export const submitBatch = async (submissions: Submissions[]) => {
-  const { data } = await axios.post(
-    `${process.env.JUDGE0_URL}/submissions/batch?base64_encoded=false`,
-    {
-      submissions,
-    },
-  );
-  return data;
-};
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export const pollBatchResults = async (tokens: Token[]) => {
+export const pollBatchResults = async (tokens) => {
   while (true) {
     const { data } = await axios.get(
-      `${process.env.JUDGE0_URL}/submissions/batch`,
+      `${process.env.JUDGE0_API_URL}/submissions/batch`,
       {
         params: {
           tokens: tokens.join(","),
@@ -49,6 +25,7 @@ export const pollBatchResults = async (tokens: Token[]) => {
     );
 
     const results = data.submissions;
+
     const isAllDone = results.every(
       (r) => r.status.id !== 1 && r.status.id !== 2,
     );
@@ -58,7 +35,20 @@ export const pollBatchResults = async (tokens: Token[]) => {
   }
 };
 
-export function getLanguageName(languageId: Number) {
+export const submitBatch = async (submissions) => {
+  const { data } = await axios.post(
+    `${process.env.JUDGE0_API_URL}/submissions/batch?base64_encoded=false`,
+    {
+      submissions,
+    },
+  );
+
+  console.log("Submission Results: ", data);
+
+  return data; // [{token} , {token} , {token}]
+};
+
+export function getLanguageName(languageId) {
   const LANGUAGE_NAMES = {
     74: "TypeScript",
     63: "JavaScript",
