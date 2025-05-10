@@ -102,7 +102,8 @@ export const executeCode: RequestHandler = async (req, res, next) => {
 
     // If All passed = true mark problem as solved for the current user
     if (allPassed) {
-      await db.problemSolved.upsert({
+      console.log("all passed now saving in problem solved table");
+      const problemSolved = await db.problemSolved.upsert({
         where: {
           userId_problemId: {
             userId,
@@ -115,6 +116,7 @@ export const executeCode: RequestHandler = async (req, res, next) => {
           problemId,
         },
       });
+      console.log("Details for problemSolved:", problemSolved);
     }
     // 8. Save individual test case results  using detailedResult
 

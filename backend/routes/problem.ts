@@ -21,6 +21,11 @@ router.post(
   asHandler(createProblem),
 );
 router.get("/", asHandler(authMiddleware), asHandler(getProblems));
+router.get(
+  "/user-solved",
+  asHandler(authMiddleware),
+  asHandler(getUserSolvedProblems),
+);
 router.get("/:id", asHandler(authMiddleware), asHandler(getProblem));
 router.put(
   "/:id",
@@ -33,11 +38,6 @@ router.delete(
   asHandler(authMiddleware),
   asHandler(checkAdmin),
   asHandler(deleteProblem),
-);
-router.post(
-  "/user-solved",
-  asHandler(authMiddleware),
-  asHandler(getUserSolvedProblems),
 );
 
 export default router;

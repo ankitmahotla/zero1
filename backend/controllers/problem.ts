@@ -261,11 +261,45 @@ const deleteProblem: RequestHandler = async (req, res, next) => {
 };
 
 const getUserSolvedProblems: RequestHandler = async (req, res, next) => {
-  const userId = req.user.userId;
+  const userId = req.user.id;
 
   try {
-    const problems = await db.problem.findMany({});
-  } catch {}
+    const problems = await db.problem.findMany({
+      where: {
+        solvedBy: {
+          some: {
+            userId,
+          },
+        },
+      },
+      include: {
+        solvedBy: {
+          where: {
+            userId,
+          },
+        },
+      },
+    });
+
+    if (!problems) {
+      return res.status(404).json({
+        success: true,
+        message: "No solved problems found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Solved problems fetched successfully",
+      problems,
+    });
+  } catch (e) {
+    console.error("Error while fetching solved problems", e);
+    res.status(500).json({
+      success: true,
+      message: "Error while fetching solved problems",
+    });
+  }
 };
 
 export {
