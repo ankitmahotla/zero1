@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.get("/", (req, res) => {
-  res.send("Leetlab backend server says Hi!");
+  res.send("Zeroone backend server says Hi!");
 });
 
 app.use("/api/v1/auth", routes.authRouter);

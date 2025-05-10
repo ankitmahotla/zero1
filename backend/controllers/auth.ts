@@ -1,6 +1,6 @@
 import { db } from "../libs/db";
-import jwt from "jsonwebtoken";
 import type { Request, Response, NextFunction } from "express";
+import { generateTokens } from "../utils/generateTokens";
 
 export type RequestHandler = (
   req: Request,
@@ -8,14 +8,10 @@ export type RequestHandler = (
   next: NextFunction,
 ) => Promise<void | Response> | void | Response;
 
-const register: RequestHandler = async (req, res, next) => {
+export const register: RequestHandler = async (req, res, next) => {
   const { email, password, name } = req.body;
   try {
-    const existingUser = await db.user.findUnique({
-      where: {
-        email,
-      },
-    });
+    const existingUser = await db.user.findUnique({ where: { email } });
     if (existingUser) {
       return res.status(400).json({
         success: false,
@@ -23,6 +19,7 @@ const register: RequestHandler = async (req, res, next) => {
       });
     }
     const hashedPassword = await Bun.password.hash(password);
+
     const newUser = await db.user.create({
       data: {
         name,
@@ -30,15 +27,34 @@ const register: RequestHandler = async (req, res, next) => {
         password: hashedPassword,
       },
     });
-    const token = jwt.sign({ id: newUser.id }, process.env.JWT_SECRET!, {
-      expiresIn: "7d",
+
+    const { accessToken, refreshToken, refreshTokenExpiry } = generateTokens({
+      id: newUser.id,
+      email: newUser.email,
     });
-    res.cookie("jwt", token, {
+    const refreshTokenMaxAge = 30 * 24 * 60 * 60 * 1000;
+
+    await db.user.update({
+      where: { id: newUser.id },
+      data: {
+        refreshToken,
+        refreshTokenExpiry,
+      },
+    });
+
+    res.cookie("accessToken", accessToken, {
       httpOnly: true,
       sameSite: "strict",
       secure: process.env.NODE_ENV !== "development",
-      maxAge: 1000 * 60 * 60 * 24 * 7,
+      maxAge: 24 * 60 * 60 * 1000,
     });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV !== "development",
+      maxAge: refreshTokenMaxAge,
+    });
+
     res.status(201).json({
       success: true,
       message: "User created successfully",
@@ -52,21 +68,16 @@ const register: RequestHandler = async (req, res, next) => {
     });
   } catch (e) {
     console.error("Error creating user:", e);
-    res.status(500).json({
-      success: false,
-      error: "Error creating user",
-    });
+    res.status(500).json({ success: false, error: "Error creating user" });
     next(e);
   }
 };
 
-const login: RequestHandler = async (req, res, next) => {
+export const login: RequestHandler = async (req, res, next) => {
   const { email, password } = req.body;
   try {
     const existingUser = await db.user.findUnique({
-      where: {
-        email,
-      },
+      where: { email },
     });
     if (!existingUser) {
       return res.status(401).json({
@@ -74,6 +85,7 @@ const login: RequestHandler = async (req, res, next) => {
         error: "No such user exists",
       });
     }
+
     const verifyPassword = await Bun.password.verify(
       password,
       existingUser.password,
@@ -84,16 +96,35 @@ const login: RequestHandler = async (req, res, next) => {
         error: "Invalid credentials",
       });
     }
-    const token = jwt.sign({ id: existingUser.id }, process.env.JWT_SECRET!, {
-      expiresIn: "7d",
+
+    const { accessToken, refreshToken, refreshTokenExpiry } = generateTokens({
+      id: existingUser.id,
+      email: existingUser.email,
     });
-    res.cookie("jwt", token, {
+    const refreshTokenMaxAge = 30 * 24 * 60 * 60 * 1000;
+
+    await db.user.update({
+      where: { id: existingUser.id },
+      data: {
+        refreshToken,
+        refreshTokenExpiry,
+      },
+    });
+
+    res.cookie("accessToken", accessToken, {
       httpOnly: true,
       sameSite: "strict",
       secure: process.env.NODE_ENV !== "development",
-      maxAge: 1000 * 60 * 60 * 24 * 7,
+      maxAge: 24 * 60 * 60 * 1000,
     });
-    res.status(201).json({
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV !== "development",
+      maxAge: refreshTokenMaxAge,
+    });
+
+    res.status(200).json({
       success: true,
       message: "User logged in successfully",
       user: {
@@ -114,7 +145,7 @@ const login: RequestHandler = async (req, res, next) => {
   }
 };
 
-const logout: RequestHandler = async (req, res, next) => {
+export const logout: RequestHandler = async (req, res, next) => {
   try {
     res.clearCookie("jwt", {
       httpOnly: true,
@@ -135,7 +166,7 @@ const logout: RequestHandler = async (req, res, next) => {
   }
 };
 
-const me: RequestHandler = async (req, res, next) => {
+export const me: RequestHandler = async (req, res, next) => {
   try {
     res.status(200).json({
       success: true,
@@ -147,4 +178,46 @@ const me: RequestHandler = async (req, res, next) => {
   }
 };
 
-export { register, login, logout, me };
+export const refreshTokens: RequestHandler = async (req, res, next) => {
+  const { refreshToken } = req.cookies;
+  const userId = req.user.id;
+
+  if (!refreshToken) {
+    return res.status(400).json({ error: "No valid refresh token" });
+  }
+
+  try {
+    const { accessToken, refreshToken, refreshTokenExpiry } = generateTokens({
+      id: userId,
+    });
+    const refreshTokenMaxAge = 30 * 24 * 60 * 60 * 1000;
+
+    await db.user.update({
+      where: { id: userId },
+      data: {
+        refreshToken,
+        refreshTokenExpiry,
+      },
+    });
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV !== "development",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV !== "development",
+      maxAge: refreshTokenMaxAge,
+    });
+
+    res
+      .status(200)
+      .json({ success: true, message: "Successfully refreshed tokens" });
+  } catch (e) {
+    console.log("Error while refreshing access token", e);
+    return res.status(500).json({ error: "No valid refresh token" });
+  }
+};
