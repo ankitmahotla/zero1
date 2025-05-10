@@ -137,7 +137,7 @@ export const deletePlaylist: RequestHandler = async (req, res, next) => {
       deletedPlaylist,
     });
   } catch (error) {
-    console.error("Error deleting playlist:", error.message);
+    console.error("Error deleting playlist:", error);
     res.status(500).json({ error: "Failed to delete playlist" });
   }
 };
@@ -170,7 +170,7 @@ export const removeProblemFromPlaylist: RequestHandler = async (
       deletedProblem,
     });
   } catch (error) {
-    console.error("Error removing problem from playlist:", error.message);
+    console.error("Error removing problem from playlist:", error);
     res.status(500).json({ error: "Failed to remove problem from playlist" });
   }
 };

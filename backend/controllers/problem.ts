@@ -37,15 +37,17 @@ const createProblem: RequestHandler = async (req, res, next) => {
         return res.status(400).json({ error: `${language} is not supported` });
       }
 
-      const submissions = testcases.map(({ input, output }) => ({
-        source_code: solutionCode,
-        language_id: languageId,
-        stdin: input,
-        expected_output: output,
-      }));
+      const submissions = testcases.map(
+        ({ input, output }: { input: string; output: string }) => ({
+          source_code: solutionCode,
+          language_id: languageId,
+          stdin: input,
+          expected_output: output,
+        }),
+      );
 
       const submissionResults = await submitBatch(submissions);
-      const tokens = submissionResults.map((res) => res.token);
+      const tokens = submissionResults.map((res: any) => res.token);
       const results = await pollBatchResults(tokens);
 
       for (let i = 0; i < results.lenth; i++) {
@@ -170,21 +172,23 @@ const updateProblem: RequestHandler = async (req, res, next) => {
     }
 
     for (const [language, solutionCode] of Object.entries(referenceSolutions)) {
-      const languageId = getLanguageId(language);
+      const languageId = getJudge0LanguageId(language);
 
       if (!languageId) {
         return res.status(400).json({ error: `${language} is not supported` });
       }
 
-      const submissions = testcases.map(({ input, output }) => ({
-        source_code: solutionCode,
-        language_id: languageId,
-        stdin: input,
-        expected_output: output,
-      }));
+      const submissions = testcases.map(
+        ({ input, output }: { input: string; output: string }) => ({
+          source_code: solutionCode,
+          language_id: languageId,
+          stdin: input,
+          expected_output: output,
+        }),
+      );
 
       const submissionResults = await submitBatch(submissions);
-      const tokens = submissionResults.map((res) => res.token);
+      const tokens = submissionResults.map((res: any) => res.token);
       const results = await pollBatchResults(tokens);
 
       for (let i = 0; i < results.lenth; i++) {
