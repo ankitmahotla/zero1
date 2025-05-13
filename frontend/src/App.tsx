@@ -2,12 +2,23 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import Home from "./pages/home";
 import Login from "./pages/login";
 import Signup from "./pages/signup";
+import { useEffect } from "react";
+import { useThemeStore } from "./store/theme";
+import Navbar from "./components/navbar";
 
 function App() {
   const isLoggedIn = false;
 
+  const theme = useThemeStore((state) => state.theme);
+
+  useEffect(() => {
+    document.documentElement.classList.remove("light", "dark");
+    document.documentElement.classList.add(theme);
+  }, [theme]);
+
   return (
     <div className="px-4 md:px-8">
+      <Navbar />
       <Routes>
         <Route
           path="/"
