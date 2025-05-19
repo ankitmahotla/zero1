@@ -8,7 +8,7 @@ import Navbar from "./components/navbar";
 import { useSessionStore } from "./store/session";
 
 function App() {
-  const { isAuthenticated } = useSessionStore();
+  const isAuthenticated = useSessionStore((state) => !!state.user_id);
 
   if (!isAuthenticated) {
     redirect("/login");
