@@ -1,4 +1,4 @@
-import { LOGIN, LOGOUT, REGISTER_USER } from "@/api/mutation";
+import { LOGIN, LOGOUT, REFRESH_TOKENS, REGISTER_USER } from "@/api/mutation";
 import { useSessionStore } from "@/store/session";
 import { useMutation } from "@tanstack/react-query";
 
@@ -37,6 +37,19 @@ export const useLogoutSync = () => {
   return useMutation({
     mutationFn: LOGOUT,
     onSuccess: () => {
+      resetSession();
+    },
+  });
+};
+
+export const useRefreshTokenSync = () => {
+  const { refreshSession, resetSession } = useSessionStore();
+  return useMutation({
+    mutationFn: REFRESH_TOKENS,
+    onSuccess: () => {
+      refreshSession();
+    },
+    onError: () => {
       resetSession();
     },
   });

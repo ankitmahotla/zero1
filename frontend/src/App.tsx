@@ -6,12 +6,22 @@ import { useEffect } from "react";
 import { useThemeStore } from "./store/theme";
 import Navbar from "./components/navbar";
 import { useSessionStore } from "./store/session";
+import { useRefreshTokenSync } from "./sync/auth";
 
 function App() {
   const isAuthenticated = useSessionStore((state) => !!state.user_id);
+  const { mutate } = useRefreshTokenSync();
 
   if (!isAuthenticated) {
     redirect("/login");
+  }
+
+  const hasExpiredToken = useSessionStore(
+    (state) => state.expiresAt !== null && Date.now() > state.expiresAt,
+  );
+
+  if (hasExpiredToken) {
+    mutate();
   }
 
   const theme = useThemeStore((state) => state.theme);
