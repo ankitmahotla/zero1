@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useSessionStore } from "@/store/session";
 import { useThemeStore } from "@/store/theme";
 import { useLogoutSync } from "@/sync/auth";
 import { Sun, Moon } from "lucide-react";
@@ -6,6 +7,7 @@ import { Sun, Moon } from "lucide-react";
 export default function Navbar() {
   const theme = useThemeStore((state) => state.theme);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
+  const { isAuthenticated } = useSessionStore();
   const { mutate } = useLogoutSync();
 
   return (
@@ -15,9 +17,11 @@ export default function Navbar() {
           <span className="font-bold text-lg">Zero1</span>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="secondary" onClick={() => mutate()}>
-            Logout
-          </Button>
+          {isAuthenticated ? (
+            <Button variant="secondary" onClick={() => mutate()}>
+              Logout
+            </Button>
+          ) : null}
           <Button
             variant="ghost"
             size="icon"
