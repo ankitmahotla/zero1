@@ -47,7 +47,7 @@ export default function Signup() {
   }
 
   return (
-    <div className="flex-1 flex items-center justify-center">
+    <div className="fixed inset-0 flex items-center justify-center">
       <Card className="w-[350px]">
         <CardHeader>
           <CardTitle className="text-center">Signup</CardTitle>
