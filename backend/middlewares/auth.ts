@@ -8,7 +8,7 @@ interface JwtPayload {
 
 export const authMiddleware: RequestHandler = async (req, res, next) => {
   try {
-    const token = req.cookies.jwt;
+    const token = req.cookies.accessToken;
 
     if (!token) {
       return res.status(401).json({
