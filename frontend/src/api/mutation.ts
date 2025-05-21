@@ -24,3 +24,7 @@ export const LOGIN = async ({ email, password }: Omit<Auth, "name">) => {
     })
   ).data;
 };
+
+export const LOGOUT = async () => {
+  return (await API.post("/api/v1/auth/logout")).data;
+};
