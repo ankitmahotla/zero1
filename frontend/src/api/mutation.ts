@@ -15,3 +15,12 @@ export const REGISTER_USER = async ({ name, email, password }: Auth) => {
     })
   ).data;
 };
+
+export const LOGIN = async ({ email, password }: Omit<Auth, "name">) => {
+  return (
+    await API.post("/api/v1/auth/login", {
+      email,
+      password,
+    })
+  ).data;
+};
