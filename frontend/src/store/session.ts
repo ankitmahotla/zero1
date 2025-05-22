@@ -4,19 +4,21 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 type SessionState = {
   user_id: string | null;
+  role: string | null;
   expiresAt: number | null;
 
   get isAuthenticated(): boolean;
 };
 
 type SessionActions = {
-  newSession: (id: string) => void;
+  newSession: (id: string, role: string) => void;
   refreshSession: () => void;
   resetSession: () => void;
 };
 
 const InitialState = {
   user_id: null,
+  role: null,
   expiresAt: null,
 };
 
@@ -27,8 +29,8 @@ export const useSessionStore = create<SessionState & SessionActions>()(
       get isAuthenticated() {
         return !!this.user_id;
       },
-      newSession: (id: string) => {
-        set({ user_id: id, expiresAt: Date.now() + 86400 * 1000 });
+      newSession: (id, role) => {
+        set({ user_id: id, role: role, expiresAt: Date.now() + 86400 * 1000 });
       },
       refreshSession: () =>
         set((state) => ({
@@ -45,6 +47,7 @@ export const useSessionStore = create<SessionState & SessionActions>()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         user_id: state.user_id,
+        role: state.role,
         expiresAt: state.expiresAt,
       }),
     },

@@ -4,7 +4,6 @@ import Login from "./pages/login";
 import Signup from "./pages/signup";
 import { useEffect } from "react";
 import { useThemeStore } from "./store/theme";
-import Navbar from "./components/navbar";
 import { useSessionStore } from "./store/session";
 import { useRefreshTokenSync } from "./sync/auth";
 import RootLayout from "./layouts/root";

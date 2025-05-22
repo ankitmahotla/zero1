@@ -2,12 +2,22 @@ import { Button } from "@/components/ui/button";
 import { useSessionStore } from "@/store/session";
 import { useThemeStore } from "@/store/theme";
 import { useLogoutSync } from "@/sync/auth";
-import { Sun, Moon } from "lucide-react";
+import { Sun, Moon, LogOutIcon } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function Navbar() {
   const theme = useThemeStore((state) => state.theme);
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
-  const { isAuthenticated } = useSessionStore();
+  const isAuthenticated = useSessionStore((state) => !!state.user_id);
+  const userRole = useSessionStore((state) => state.role);
   const { mutate } = useLogoutSync();
 
   return (
@@ -17,11 +27,6 @@ export default function Navbar() {
           <span className="font-bold text-lg">Zero1</span>
         </div>
         <div className="flex items-center gap-2">
-          {isAuthenticated ? (
-            <Button variant="secondary" onClick={() => mutate()}>
-              Logout
-            </Button>
-          ) : null}
           <Button
             variant="ghost"
             size="icon"
@@ -34,6 +39,29 @@ export default function Navbar() {
               <Moon className="h-5 w-5" />
             )}
           </Button>
+          {isAuthenticated ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Avatar>
+                  <AvatarImage src="https://github.com/shadcn.png" />
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="flex justify-between"
+                  onClick={() => mutate()}
+                >
+                  Logout <LogOutIcon size={16} />
+                </DropdownMenuItem>
+                {userRole === "ADMIN" && (
+                  <DropdownMenuItem>Add Problem</DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : null}
         </div>
       </div>
     </nav>

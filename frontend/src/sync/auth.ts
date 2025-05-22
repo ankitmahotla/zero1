@@ -8,7 +8,7 @@ export const useRegisterSync = () => {
     mutationFn: REGISTER_USER,
     onSuccess: (data) => {
       if (data.user) {
-        newSession(data.user.id);
+        newSession(data.user.id, data.user.role);
       }
     },
     onError: () => {
@@ -23,7 +23,7 @@ export const useLoginSync = () => {
     mutationFn: LOGIN,
     onSuccess: (data) => {
       if (data.user) {
-        newSession(data.user.id);
+        newSession(data.user.id, data.user.role);
       }
     },
     onError: () => {
