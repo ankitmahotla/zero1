@@ -12,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Link } from "react-router-dom";
 
 export default function Navbar() {
   const theme = useThemeStore((state) => state.theme);
@@ -57,7 +58,11 @@ export default function Navbar() {
                   Logout <LogOutIcon size={16} />
                 </DropdownMenuItem>
                 {userRole === "ADMIN" && (
-                  <DropdownMenuItem>Add Problem</DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link className="w-full" to="/add-problem">
+                      Add Problem
+                    </Link>
+                  </DropdownMenuItem>
                 )}
               </DropdownMenuContent>
             </DropdownMenu>
